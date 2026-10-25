@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yıldız Yakala</title>
+<style>
+:root{--bg:#f4f1ea;--fg:#1f2430;--card:#ffffff;--accent:#e8a800;--bad:#d64545;--sky:#dfe9f5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171f;--fg:#eef0f5;--card:#1e2330;--accent:#ffcc33;--bad:#ff6b6b;--sky:#1a2236}}
+:root[data-theme="dark"]{--bg:#14171f;--fg:#eef0f5;--card:#1e2330;--accent:#ffcc33;--bad:#ff6b6b;--sky:#1a2236}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px;box-sizing:border-box}
+h1{font-size:1.3rem;margin:0}
+.bar{display:flex;gap:16px;font-weight:600;font-size:1rem}
+#wrap{position:relative;width:100%;max-width:420px;flex:0 1 auto}
+canvas{width:100%;height:auto;aspect-ratio:3/4;max-height:68vh;background:var(--sky);border-radius:14px;touch-action:none;display:block;margin:0 auto}
+#msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:color-mix(in srgb,var(--card) 88%,transparent);border-radius:14px;text-align:center;padding:20px}
+button{font:inherit;font-weight:700;padding:10px 24px;border:0;border-radius:999px;background:var(--accent);color:#1f2430;cursor:pointer}
+small{opacity:.7}
+</style>
+</head>
+<body>
+<h1>⭐ Yıldız Yakala</h1>
+<div class="bar"><span>Puan: <b id="sc">0</b></span><span>Can: <b id="lv">3</b></span><span>En iyi: <b id="hi">0</b></span></div>
+<div id="wrap">
+<canvas id="c" width="360" height="480"></canvas>
+<div id="msg"><div id="t">Sepetle yıldızları yakala,<br>bombalardan kaç!</div><small>Fare, dokunma veya ← → tuşları</small><button id="b">Başla</button></div>
+</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=cv.width,H=cv.height;
+const sc=document.getElementById('sc'),lv=document.getElementById('lv'),hi=document.getElementById('hi'),msg=document.getElementById('msg'),t=document.getElementById('t');
+let p,items,score,lives,run=false,best=0,spawn=0,keys={},last=0;
+try{best=+localStorage.getItem('yy-best')||0}catch(e){}
+hi.textContent=best;
+function reset(){p={x:W/2,w:70,h:16};items=[];score=0;lives=3;spawn=0;sc.textContent=0;lv.textContent=3}
+function start(){reset();run=true;msg.style.display='none';last=performance.now();requestAnimationFrame(loop)}
+function over(){run=false;if(score>best){best=score;hi.textContent=best;try{localStorage.setItem('yy-best',best)}catch(e){}}
+t.innerHTML='Oyun bitti!<br>Puanın: <b>'+score+'</b>';document.getElementById('b').textContent='Tekrar oyna';msg.style.display='flex'}
+function moveTo(cx){const r=cv.getBoundingClientRect();p.x=Math.max(p.w/2,Math.min(W-p.w/2,(cx-r.left)/r.width*W))}
+cv.addEventListener('pointermove',e=>{if(run)moveTo(e.clientX)});
+cv.addEventListener('pointerdown',e=>{if(run)moveTo(e.clientX)});
+addEventListener('keydown',e=>keys[e.key]=true);addEventListener('keyup',e=>keys[e.key]=false);
+document.getElementById('b').onclick=start;
+function loop(n){if(!run)return;const dt=Math.min(40,n-last)/16.7;last=n;
+if(p){if(keys.ArrowLeft)p.x-=6*dt;if(keys.ArrowRight)p.x+=6*dt;p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x))}
+spawn-=dt;if(spawn<=0){spawn=Math.max(18,45-score*0.6);items.push({x:20+Math.random()*(W-40),y:-20,v:(2+Math.random()*1.5+score*0.04),bomb:Math.random()<0.25})}
+const py=H-40;
+items=items.filter(o=>{o.y+=o.v*dt;
+if(o.y>py-10&&o.y<py+10&&Math.abs(o.x-p.x)<p.w/2+8){if(o.bomb){lives--;lv.textContent=lives;if(lives<=0)over()}else{score++;sc.textContent=score}return false}
+if(o.y>H+20){if(!o.bomb){lives--;lv.textContent=lives;if(lives<=0)over()}return false}return true});
+draw(py);if(run)requestAnimationFrame(loop)}
+function draw(py){x.clearRect(0,0,W,H);x.font='28px serif';x.textAlign='center';x.textBaseline='middle';
+items.forEach(o=>x.fillText(o.bomb?'💣':'⭐',o.x,o.y));
+x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--fg')||'#222';
+x.beginPath();x.roundRect(p.x-p.w/2,py,p.w,p.h,8);x.fill()}
+reset();draw(H-40);
+</script>
+</body>
+</html>
