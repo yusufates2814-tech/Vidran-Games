@@ -1,137 +1,125 @@
-<!-- Three.js for 3D Subway Surfers Game Engine -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIDRAN GAMES - Ultimate Arcade Portal</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0d0f14; color: #dcdedf; user-select: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background-color: #0d0f14; color: #dcdedf; user-select: none; }
 
+nav { background-color: #11141c; display: flex; justify-content: space-between; align-items: center; padding: 12px 40px; border-bottom: 1px solid #1c212d; position: relative; z-index: 100; flex-wrap: wrap; gap: 10px; }
+.nav-left { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+.logo-box { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+.logo-shield-svg { width: 42px; height: 46px; filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.7)); }
+.logo-text-group { display: flex; flex-direction: column; align-items: flex-start; }
+.logo-title { color: #ffffff; font-weight: 900; font-size: 22px; letter-spacing: 2px; line-height: 1; }
+.logo-sub-box { border: 1.5px solid #f39c12; border-radius: 4px; padding: 1px 14px; margin-top: 3px; background: rgba(243, 156, 18, 0.05); }
+.logo-sub-text { color: #f39c12; font-weight: 800; font-size: 10px; letter-spacing: 3px; display: block; line-height: 1; }
+.nav-links { display: flex; gap: 15px; align-items: center; height: 100%; flex-wrap: wrap; }
+.nav-links button { background: none; border: none; color: #9aa0a6; font-size: 14px; font-weight: 600; cursor: pointer; padding: 12px 10px; position: relative; transition: color 0.2s; }
+.nav-links button:hover { color: #fff; }
+.nav-links button.active { color: #f39c12; font-weight: 700; }
+.nav-links button.active::after { content: ''; position: absolute; bottom: -12px; left: 0; width: 100%; height: 3px; background-color: #f39c12; border-radius: 2px; box-shadow: 0 0 8px #f39c12; }
+.nav-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.search-box input { background: #161a23; border: 1px solid #272d3b; color: #fff; padding: 8px 14px; border-radius: 4px; font-size: 12px; outline: none; width: 150px; }
+.lang-select { background: #161a23; color: #f39c12; border: 1px solid #272d3b; font-size: 12px; font-weight: 600; padding: 7px 10px; border-radius: 4px; cursor: pointer; outline: none; }
+.lang-select option { background: #11141c; color: #fff; }
+.btn-login { background: #1c212d; color: #dcdedf; border: 1px solid #2a3142; font-size: 12px; cursor: pointer; padding: 8px 16px; border-radius: 4px; font-weight: 600; }
+.btn-login:hover { background: #252c3d; color: #fff; }
+.btn-register { background: #f39c12; color: #000; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
+.btn-register:hover { background: #e09f3e; }
 
+.container { max-width: 1120px; margin: 25px auto; padding: 0 20px; position: relative; z-index: 10; }
+.page-view { display: none; }
+.page-view.active { display: block; }
 
+.sponsored-ad-banner { background: linear-gradient(135deg, #2c3e50, #0d0f14); border: 2px dashed #f39c12; border-radius: 8px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 5px 20px rgba(243,156,18,0.15); }
+.sponsored-badge { position: absolute; top: 8px; left: 10px; background: #f39c12; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 3px; letter-spacing: 1px; }
+.ad-content-left h2 { color: #fff; font-size: 20px; font-weight: 900; margin-top: 10px; margin-bottom: 4px; }
+.ad-content-left p { color: #a3a8b3; font-size: 12px; }
+.ad-visual-box { width: 160px; height: 75px; background: #181c28; border: 1px solid #f39c12; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f39c12; font-weight: bold; font-size: 11px; text-align: center; flex-shrink: 0; }
 
-VIDRAN GAMES - Complete Web Portal
+.hero-section { display: grid; grid-template-columns: 2.3fr 1fr; gap: 15px; margin-bottom: 30px; }
+.hero-main { background: linear-gradient(135deg, #1c140a 0%, #110d07 100%); border-radius: 6px; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; cursor: pointer; border: 1px solid #231d14; position: relative; overflow: hidden; }
+.hero-main h1 { color: #fff; font-size: 32px; font-weight: 900; margin-bottom: 6px; z-index: 2; }
+.hero-main p { color: #a3a8b3; font-size: 13px; z-index: 2; }
+.hero-sidebar { display: flex; flex-direction: column; gap: 10px; }
+.side-card { background: #12151e; border-radius: 6px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid #1f2330; transition: 0.2s; }
+.side-card:hover { border-color: #f39c12; background: #181c28; }
+.side-img { width: 60px; height: 45px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #000; }
 
-    /* Navigation Bar */
-    nav { background-color: #11141c; display: flex; justify-content: space-between; align-items: center; padding: 12px 40px; border-bottom: 1px solid #1c212d; position: relative; z-index: 100; }
-    .nav-left { display: flex; align-items: center; gap: 30px; }
-    
-    /* Logolar ve Tasarım */
-    .logo-box { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
-    .logo-shield-svg { width: 42px; height: 46px; filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.7)); }
-    .logo-text-group { display: flex; flex-direction: column; align-items: flex-start; }
-    .logo-title { color: #ffffff; font-weight: 900; font-size: 22px; letter-spacing: 2px; line-height: 1; }
-    .logo-sub-box { border: 1.5px solid #f39c12; border-radius: 4px; padding: 1px 14px; margin-top: 3px; background: rgba(243, 156, 18, 0.05); }
-    .logo-sub-text { color: #f39c12; font-weight: 800; font-size: 10px; letter-spacing: 3px; display: block; line-height: 1; }
+.section-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 14px; border-left: 4px solid #f39c12; padding-left: 10px; }
+.categories { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
+.cat-btn { background: #12151e; color: #a3a8b3; border: 1px solid #1f2330; padding: 7px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+.cat-btn.active, .cat-btn:hover { background: #f39c12; color: #000; font-weight: bold; border-color: #f39c12; }
 
-    .nav-links { display: flex; gap: 15px; align-items: center; height: 100%; }
-    .nav-links button { background: none; border: none; color: #9aa0a6; font-size: 14px; font-weight: 600; cursor: pointer; padding: 12px 10px; position: relative; transition: color 0.2s; }
-    .nav-links button:hover { color: #fff; }
-    .nav-links button.active { color: #f39c12; font-weight: 700; }
-    .nav-links button.active::after { content: ''; position: absolute; bottom: -12px; left: 0; width: 100%; height: 3px; background-color: #f39c12; border-radius: 2px; box-shadow: 0 0 8px #f39c12; }
+.game-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+.game-card { background: #12151e; border-radius: 6px; overflow: hidden; border: 1px solid #1f2330; cursor: pointer; position: relative; transition: transform 0.2s, border-color 0.2s; }
+.game-card:hover { transform: translateY(-4px); border-color: #f39c12; }
+.game-banner { height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 13px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-align: center; padding: 8px; }
+.game-details { padding: 12px; }
+.game-details h4 { font-size: 13px; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-details .tags { font-size: 11px; color: #717784; margin-bottom: 6px; }
+.game-details .price { font-size: 12px; font-weight: bold; color: #f39c12; }
+.admin-card-actions { position: absolute; top: 8px; right: 8px; display: none; gap: 4px; z-index: 5; }
+.admin-card-actions button { background: rgba(0,0,0,0.85); border: 1px solid #fff; color: #fff; padding: 3px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+.admin-card-actions button:hover { background: #f39c12; color: #000; border-color: #f39c12; }
 
-    .nav-right { display: flex; align-items: center; gap: 12px; }
-    .search-box input { background: #161a23; border: 1px solid #272d3b; color: #fff; padding: 8px 14px; border-radius: 4px; font-size: 12px; outline: none; width: 150px; }
-    
-    .lang-select { background: #161a23; color: #f39c12; border: 1px solid #272d3b; font-size: 12px; font-weight: 600; padding: 7px 10px; border-radius: 4px; cursor: pointer; outline: none; }
-    .lang-select option { background: #11141c; color: #fff; }
+.profile-header-card { background: #12151e; padding: 25px; border-radius: 8px; border: 1px solid #1f2330; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
+.profile-avatar-large { width: 80px; height: 80px; background: #f39c12; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: #000; border: 3px solid #272d3b; }
+.profile-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+.stat-card { background: #12151e; padding: 15px; border-radius: 6px; border: 1px solid #1f2330; text-align: center; }
+.stat-card h3 { color: #f39c12; font-size: 22px; font-weight: 900; margin-top: 5px; }
+.profile-settings-box { background: #12151e; padding: 20px; border-radius: 8px; border: 1px solid #1f2330; }
+.profile-settings-box input, .profile-settings-box select { width: 100%; background: #181b24; border: 1px solid #2a2e3d; color: #fff; padding: 9px; border-radius: 4px; margin-top: 5px; margin-bottom: 14px; outline: none; font-size: 12px; }
 
-    .btn-login { background: #1c212d; color: #dcdedf; border: 1px solid #2a3142; font-size: 12px; cursor: pointer; padding: 8px 16px; border-radius: 4px; font-weight: 600; }
-    .btn-login:hover { background: #252c3d; color: #fff; }
-    .btn-register { background: #f39c12; color: #000; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
-    .btn-register:hover { background: #e09f3e; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay.active { display: flex; }
+.modal-card { background: #12151e; width: 380px; max-width: 94vw; padding: 25px; border-radius: 8px; border: 1px solid #1f2330; position: relative; }
+.modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #8a8f99; font-size: 18px; cursor: pointer; }
+.tab-header { display: flex; border-bottom: 1px solid #1f2330; margin-bottom: 15px; }
+.tab-btn { flex: 1; background: none; border: none; color: #8a8f99; padding: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
+.tab-btn.active { color: #f39c12; border-bottom: 2px solid #f39c12; }
+.modal-card input, .modal-card select { width: 100%; background: #181b24; border: 1px solid #2a2e3d; color: #fff; padding: 9px; border-radius: 4px; margin-top: 5px; margin-bottom: 14px; outline: none; font-size: 12px; }
+.modal-btn { width: 100%; background: #f39c12; color: #000; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
+.error-msg { color: #e74c3c; font-size: 11px; margin-bottom: 10px; display: none; font-weight: bold; }
 
-    /* Sayfa Düzeni */
-    .container { max-width: 1120px; margin: 25px auto; padding: 0 20px; position: relative; z-index: 10; }
-    .page-view { display: none; }
-    .page-view.active { display: block; }
+#game2048Board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #bbada0; padding: 8px; border-radius: 6px; width: 280px; height: 280px; margin: 15px auto; }
+.tile { background: #ccc0b3; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: #776e65; }
+.tile-2 { background: #eee4da; } .tile-4 { background: #ede0c8; } .tile-8 { background: #f2b179; color: #fff; } .tile-16 { background: #f59563; color: #fff; }
 
-    /* Sponsorlu Reklam Bannerı */
-    .sponsored-ad-banner { background: linear-gradient(135deg, #2c3e50, #0d0f14); border: 2px dashed #f39c12; border-radius: 8px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 5px 20px rgba(243,156,18,0.15); }
-    .sponsored-badge { position: absolute; top: 8px; left: 10px; background: #f39c12; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 3px; letter-spacing: 1px; }
-    .ad-content-left h2 { color: #fff; font-size: 20px; font-weight: 900; margin-top: 10px; margin-bottom: 4px; }
-    .ad-content-left p { color: #a3a8b3; font-size: 12px; }
-    .ad-visual-box { width: 160px; height: 75px; background: #181c28; border: 1px solid #f39c12; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f39c12; font-weight: bold; font-size: 11px; text-align: center; }
+.ai-chat-btn { position: fixed; bottom: 20px; right: 20px; background: #f39c12; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(243,156,18,0.4); z-index: 500; }
+.ai-chat-box { position: fixed; bottom: 75px; right: 20px; width: 340px; max-width: 94vw; height: 420px; background: #12151e; border: 1px solid #272d3b; border-radius: 8px; display: none; flex-direction: column; z-index: 500; }
+.ai-chat-box.active { display: flex; }
+.ai-chat-header { background: #181c28; padding: 12px; font-weight: bold; color: #f39c12; display: flex; justify-content: space-between; font-size: 13px; }
+.ai-chat-messages { flex: 1; padding: 12px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
+.msg { padding: 8px 12px; border-radius: 6px; max-width: 85%; }
+.msg.user { background: #f39c12; color: #000; align-self: flex-end; font-weight: 600; }
+.msg.ai { background: #181b24; color: #dcdedf; border: 1px solid #2a2e3d; align-self: flex-start; }
+.ai-chat-input { display: flex; padding: 8px; border-top: 1px solid #272d3b; background: #161a23; }
+.ai-chat-input input { flex: 1; background: #11141c; border: 1px solid #272d3b; color: #fff; padding: 8px; border-radius: 4px; font-size: 12px; outline: none; }
+.ai-chat-input button { background: #f39c12; color: #000; border: none; padding: 8px 12px; border-radius: 4px; margin-left: 6px; font-weight: bold; cursor: pointer; }
 
-    /* Hero Alanı */
-    .hero-section { display: grid; grid-template-columns: 2.3fr 1fr; gap: 15px; margin-bottom: 30px; }
-    .hero-main { background: linear-gradient(135deg, #1c140a 0%, #110d07 100%); border-radius: 6px; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; cursor: pointer; border: 1px solid #231d14; position: relative; overflow: hidden; }
-    .hero-main h1 { color: #fff; font-size: 32px; font-weight: 900; margin-bottom: 6px; z-index: 2; }
-    .hero-main p { color: #a3a8b3; font-size: 13px; z-index: 2; }
+#subwayCanvasContainer { position: relative; width: 100%; height: 500px; background: #000; display: none; overflow: hidden; border-radius: 8px; margin-bottom: 15px; }
+#subwayCanvasContainer canvas { width: 100%; height: 100%; display: block; }
+.subway-ui { position: absolute; top: 15px; left: 15px; font-size: 20px; font-weight: bold; color: #fff; z-index: 10; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.subway-controls { position: absolute; bottom: 15px; width: 100%; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px; z-index: 10; }
 
-    .hero-sidebar { display: flex; flex-direction: column; gap: 10px; }
-    .side-card { background: #12151e; border-radius: 6px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid #1f2330; transition: 0.2s; }
-    .side-card:hover { border-color: #f39c12; background: #181c28; }
-    .side-img { width: 60px; height: 45px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #000; }
+footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-size: 12px; color: #5a606d; margin-top: 40px; }
 
-    .section-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 14px; border-left: 4px solid #f39c12; padding-left: 10px; }
-
-    /* Kategoriler ve Oyun Grid */
-    .categories { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
-    .cat-btn { background: #12151e; color: #a3a8b3; border: 1px solid #1f2330; padding: 7px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .cat-btn.active, .cat-btn:hover { background: #f39c12; color: #000; font-weight: bold; border-color: #f39c12; }
-
-    .game-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-    .game-card { background: #12151e; border-radius: 6px; overflow: hidden; border: 1px solid #1f2330; cursor: pointer; position: relative; transition: transform 0.2s, border-color 0.2s; }
-    .game-card:hover { transform: translateY(-4px); border-color: #f39c12; }
-    .game-banner { height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 13px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-align: center; padding: 8px; }
-    .game-details { padding: 12px; }
-    .game-details h4 { font-size: 13px; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .game-details .tags { font-size: 11px; color: #717784; margin-bottom: 6px; }
-    .game-details .price { font-size: 12px; font-weight: bold; color: #f39c12; }
-
-    .admin-card-actions { position: absolute; top: 8px; right: 8px; display: none; gap: 4px; z-index: 5; }
-    .admin-card-actions button { background: rgba(0,0,0,0.85); border: 1px solid #fff; color: #fff; padding: 3px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; }
-    .admin-card-actions button:hover { background: #f39c12; color: #000; border-color: #f39c12; }
-
-    /* Profil Sayfası */
-    .profile-header-card { background: #12151e; padding: 25px; border-radius: 8px; border: 1px solid #1f2330; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
-    .profile-avatar-large { width: 80px; height: 80px; background: #f39c12; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: #000; border: 3px solid #272d3b; }
-    .profile-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-    .stat-card { background: #12151e; padding: 15px; border-radius: 6px; border: 1px solid #1f2330; text-align: center; }
-    .stat-card h3 { color: #f39c12; font-size: 22px; font-weight: 900; margin-top: 5px; }
-    .profile-settings-box { background: #12151e; padding: 20px; border-radius: 8px; border: 1px solid #1f2330; }
-    .profile-settings-box input, .profile-settings-box select { width: 100%; background: #181b24; border: 1px solid #2a2e3d; color: #fff; padding: 9px; border-radius: 4px; margin-top: 5px; margin-bottom: 14px; outline: none; font-size: 12px; }
-
-    /* Modals */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-overlay.active { display: flex; }
-    .modal-card { background: #12151e; width: 380px; padding: 25px; border-radius: 8px; border: 1px solid #1f2330; position: relative; }
-    .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #8a8f99; font-size: 18px; cursor: pointer; }
-
-    .tab-header { display: flex; border-bottom: 1px solid #1f2330; margin-bottom: 15px; }
-    .tab-btn { flex: 1; background: none; border: none; color: #8a8f99; padding: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .tab-btn.active { color: #f39c12; border-bottom: 2px solid #f39c12; }
-    .modal-card input, .modal-card select { width: 100%; background: #181b24; border: 1px solid #2a2e3d; color: #fff; padding: 9px; border-radius: 4px; margin-top: 5px; margin-bottom: 14px; outline: none; font-size: 12px; }
-    .modal-btn { width: 100%; background: #f39c12; color: #000; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .error-msg { color: #e74c3c; font-size: 11px; margin-bottom: 10px; display: none; font-weight: bold; }
-
-    #game2048Board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #bbada0; padding: 8px; border-radius: 6px; width: 280px; height: 280px; margin: 15px auto; }
-    .tile { background: #ccc0b3; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: #776e65; }
-    .tile-2 { background: #eee4da; } .tile-4 { background: #ede0c8; } .tile-8 { background: #f2b179; color: #fff; } .tile-16 { background: #f59563; color: #fff; }
-
-    /* AI Asistan */
-    .ai-chat-btn { position: fixed; bottom: 20px; right: 20px; background: #f39c12; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(243,156,18,0.4); z-index: 500; }
-    .ai-chat-box { position: fixed; bottom: 75px; right: 20px; width: 340px; height: 420px; background: #12151e; border: 1px solid #272d3b; border-radius: 8px; display: none; flex-direction: column; z-index: 500; }
-    .ai-chat-box.active { display: flex; }
-    .ai-chat-header { background: #181c28; padding: 12px; font-weight: bold; color: #f39c12; display: flex; justify-content: space-between; font-size: 13px; }
-    .ai-chat-messages { flex: 1; padding: 12px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .msg { padding: 8px 12px; border-radius: 6px; max-width: 85%; }
-    .msg.user { background: #f39c12; color: #000; align-self: flex-end; font-weight: 600; }
-    .msg.ai { background: #181b24; color: #dcdedf; border: 1px solid #2a2e3d; align-self: flex-start; }
-    .ai-chat-input { display: flex; padding: 8px; border-top: 1px solid #272d3b; background: #161a23; }
-    .ai-chat-input input { flex: 1; background: #11141c; border: 1px solid #272d3b; color: #fff; padding: 8px; border-radius: 4px; font-size: 12px; outline: none; }
-    .ai-chat-input button { background: #f39c12; color: #000; border: none; padding: 8px 12px; border-radius: 4px; margin-left: 6px; font-weight: bold; cursor: pointer; }
-
-    /* Subway Surfers 3D Canvas styling */
-    #subwayCanvasContainer { position: relative; width: 100%; height: 500px; background: #000; display: none; overflow: hidden; border-radius: 8px; }
-    #subwayCanvasContainer canvas { width: 100%; height: 100%; display: block; }
-    .subway-ui { position: absolute; top: 15px; left: 15px; font-size: 20px; font-weight: bold; color: #fff; z-index: 10; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-    .subway-controls { position: absolute; bottom: 15px; width: 100%; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px; z-index: 10; }
-
-    footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-size: 12px; color: #5a606d; margin-top: 40px; }
+@media (max-width: 800px) {
+  nav { padding: 12px 16px; }
+  .game-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-section { grid-template-columns: 1fr; }
+  .profile-stats-grid { grid-template-columns: 1fr; }
+  #libraryGrid { grid-template-columns: 1fr !important; }
+}
 </style>
+</head>
+<body>
 
-
-<!-- Navigasyon -->
 <nav>
     <div class="nav-left">
         <div class="logo-box" onclick="switchPage('store')">
@@ -166,14 +154,12 @@ VIDRAN GAMES - Complete Web Portal
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Oyun ara..." oninput="searchGames(this.value)">
         </div>
-        
         <select class="lang-select">
             <option value="tr">🇹🇷 Türkçe</option>
             <option value="en">🇬🇧 English</option>
             <option value="es">🇪🇸 Español</option>
             <option value="de">🇩🇪 Deutsch</option>
         </select>
-
         <div id="authButtons">
             <button class="btn-login" onclick="openAuthModal('player')">Giriş Yap</button>
             <button class="btn-register" onclick="openAuthModal('admin')">Admin Paneli</button>
@@ -189,35 +175,32 @@ VIDRAN GAMES - Complete Web Portal
 
     <!-- 1. MAĞAZA -->
     <div id="page-store" class="page-view active">
-        
         <div class="sponsored-ad-banner">
             <span class="sponsored-badge">SPONSORLU REKLAM</span>
             <div class="ad-content-left">
                 <h2>Monster Energy Gaming Pass</h2>
                 <p>En yüksek performanslı oyuncu ekipmanları ve özel oyun içi bonuslar seni bekliyor!</p>
             </div>
-            <div class="ad-visual-box">
-                <span>%50 İNDİRİM<br>HEMEN İNCELE</span>
-            </div>
+            <div class="ad-visual-box"><span>%50 İNDİRİM<br>HEMEN İNCELE</span></div>
         </div>
 
         <div class="hero-section">
-            <div class="hero-main" onclick="openGame(storeGames[0])">
+            <div class="hero-main" onclick="openGameByTitle('Subway Surfers 3D')">
                 <h1>Subway Surfers 3D</h1>
                 <p>İstasyon görevlilerinden kaçın ve engelleri aşarak en yüksek skoru yapın!</p>
             </div>
             <div class="hero-sidebar">
-                <div class="side-card" onclick="openGame(storeGames[1])">
+                <div class="side-card" onclick="openGameByTitle('Temple Run 2')">
                     <div class="side-img" style="background:#c0392b;">RUN</div>
                     <div><div style="color:#fff; font-size:13px; font-weight:bold;">Temple Run 2</div><div style="font-size:11px; color:#8a8f99;">Ücretsiz</div></div>
                 </div>
-                <div class="side-card" onclick="openGame(storeGames[3])">
+                <div class="side-card" onclick="openGameByTitle('Moto X3M')">
                     <div class="side-img" style="background:#ce93d8;">MOTO</div>
                     <div><div style="color:#fff; font-size:13px; font-weight:bold;">Moto X3M</div><div style="font-size:11px; color:#8a8f99;">Ücretsiz</div></div>
                 </div>
-                <div class="side-card" onclick="openGame(storeGames[4])">
-                    <div class="side-img" style="background:#a5d6a7;">HOOK</div>
-                    <div><div style="color:#fff; font-size:13px; font-weight:bold;">Stickman Hook</div><div style="font-size:11px; color:#8a8f99;">Ücretsiz</div></div>
+                <div class="side-card" onclick="openGameByTitle('Yıldız Yakala')">
+                    <div class="side-img" style="background:#e8a800;">⭐</div>
+                    <div><div style="color:#fff; font-size:13px; font-weight:bold;">Yıldız Yakala</div><div style="font-size:11px; color:#8a8f99;">Ücretsiz · Yeni</div></div>
                 </div>
             </div>
         </div>
@@ -231,22 +214,14 @@ VIDRAN GAMES - Complete Web Portal
             <button class="cat-btn" onclick="filterCategory('Spor', this)">Spor</button>
         </div>
 
-        <div class="section-title">En Popüler 24 Oyun</div>
+        <div class="section-title">En Popüler Oyunlar</div>
         <div class="game-grid" id="mainGameGrid"></div>
     </div>
 
     <!-- 2. KÜTÜPHANE -->
     <div id="page-library" class="page-view">
         <h2 class="section-title">Kütüphaneniz</h2>
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;" id="libraryGrid">
-            <div class="game-card" style="padding:15px; display:flex; gap:15px; align-items:center;">
-                <div style="width:50px; height:50px; background:#e74c3c; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">2048</div>
-                <div>
-                    <h4 style="color:#fff;">2048 Klasik</h4>
-                    <button class="btn-register" style="margin-top:6px; padding:4px 10px;" onclick="start2048Game()">Oyna</button>
-                </div>
-            </div>
-        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;" id="libraryGrid"></div>
     </div>
 
     <!-- 3. PROFİL -->
@@ -258,30 +233,17 @@ VIDRAN GAMES - Complete Web Portal
                 <p id="profileBioDisplay" style="color:#8a8f99; font-size:13px; margin-top:4px;">Oyun tutkunu · Vidran Games topluluk üyesi</p>
             </div>
         </div>
-
         <div class="profile-stats-grid">
-            <div class="stat-card">
-                <span style="font-size:12px; color:#8a8f99;">Kütüphanedeki Oyunlar</span>
-                <h3 id="statLibCount">1</h3>
-            </div>
-            <div class="stat-card">
-                <span style="font-size:12px; color:#8a8f99;">Toplam Oynama Süresi</span>
-                <h3>18 Saat</h3>
-            </div>
-            <div class="stat-card">
-                <span style="font-size:12px; color:#8a8f99;">Hesap Seviyesi</span>
-                <h3>Seviye 15</h3>
-            </div>
+            <div class="stat-card"><span style="font-size:12px; color:#8a8f99;">Kütüphanedeki Oyunlar</span><h3 id="statLibCount">1</h3></div>
+            <div class="stat-card"><span style="font-size:12px; color:#8a8f99;">Toplam Oynama Süresi</span><h3>18 Saat</h3></div>
+            <div class="stat-card"><span style="font-size:12px; color:#8a8f99;">Hesap Seviyesi</span><h3>Seviye 15</h3></div>
         </div>
-
         <div class="profile-settings-box">
             <h3 style="color:#f39c12; margin-bottom:15px; font-size:15px;">⚙️ Profil Ayarlarını Düzenle</h3>
             <label style="font-size:12px; color:#8a8f99;">Görünen Ad / Kullanıcı Adı</label>
             <input type="text" id="settingsNameInput" placeholder="Adınızı girin...">
-            
             <label style="font-size:12px; color:#8a8f99;">Hakkımda (Bio)</label>
             <input type="text" id="settingsBioInput" placeholder="Kendinizden bahsedin...">
-
             <label style="font-size:12px; color:#8a8f99;">Profil Avatar Simgesi</label>
             <select id="settingsAvatarSelect">
                 <option value="🎮">🎮 Oyun Kolu</option>
@@ -290,7 +252,6 @@ VIDRAN GAMES - Complete Web Portal
                 <option value="⚡">⚡ Yıldırım</option>
                 <option value="🛡️">🛡️ Kalkan</option>
             </select>
-
             <button class="modal-btn" style="margin-top:10px;" onclick="saveProfileSettings()">Değişiklikleri Kaydet</button>
         </div>
     </div>
@@ -304,32 +265,22 @@ VIDRAN GAMES - Complete Web Portal
         </div>
     </div>
 
-    <!-- 5. OYUN DETAY VE OYNATMA EKRANI -->
+    <!-- 5. OYUN DETAY -->
     <div id="page-detail" class="page-view">
-        <button onclick="switchPage('store'); stopSubwayGame();" style="background:none; border:none; color:#f39c12; cursor:pointer; margin-bottom:15px; font-weight:bold;">← Mağazaya Dön</button>
+        <button onclick="leaveDetail()" style="background:none; border:none; color:#f39c12; cursor:pointer; margin-bottom:15px; font-weight:bold;">← Mağazaya Dön</button>
         <h1 id="detail-title" style="font-size:26px; color:#fff;">Oyun Adı</h1>
-        
-        <!-- Standard Container -->
+
         <div id="detail-banner" style="width:100%; height:500px; background:#181c28; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:20px; margin:15px 0; border:1px solid #272d3b; text-align:center; position:relative; overflow:hidden;">
-            <div id="gamePlayContainer" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <div style="font-size:48px; margin-bottom:10px;">🎮</div>
-                <div id="detailGameNameText" style="margin-bottom:15px; color:#f39c12;">Oyun Yüklendi!</div>
-                <button class="btn-register" style="padding: 12px 28px; font-size: 15px;" onclick="launchUploadedGame()">Oyunu Başlat</button>
-            </div>
+            <div id="gamePlayContainer" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;"></div>
         </div>
 
-        <!-- 3D Subway Surfers Canvas Container -->
-        <div id="subwayCanvasContainer">
-            <div class="subway-ui">SKOR: <span id="subwayScore">0</span></div>
-            <div class="subway-controls">Sol/Sağ Ok Tuşları: Şerit Değiştir | Yukarı Ok: Zıpla</div>
-        </div>
+        <div id="subwayCanvasContainer"></div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#12151e; padding:20px; border-radius:6px; border:1px solid #1f2330;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#12151e; padding:20px; border-radius:6px; border:1px solid #1f2330; flex-wrap:wrap; gap:10px;">
             <div><h3 style="color:#fff;">Oyunu Kütüphanene Ekle</h3></div>
             <div><span id="detail-price" style="font-size:18px; font-weight:bold; color:#f39c12; margin-right:15px;">Ücretsiz</span><button class="btn-register" onclick="addToLibrary()">Kütüphaneye Ekle</button></div>
         </div>
     </div>
-
 </div>
 
 <!-- Giriş Modalı -->
@@ -340,13 +291,11 @@ VIDRAN GAMES - Complete Web Portal
             <button class="tab-btn active" id="tabPlayerBtn" onclick="switchAuthTab('player')">Oyuncu Girişi</button>
             <button class="tab-btn" id="tabAdminBtn" onclick="switchAuthTab('admin')">Admin Girişi</button>
         </div>
-
         <div id="playerAuthForm">
             <label style="font-size:12px; color:#8a8f99;">Kullanıcı Adı</label>
             <input type="text" id="playerUsernameInput" placeholder="Kullanıcı adınızı girin...">
             <button class="modal-btn" onclick="handlePlayerLogin()">Giriş Yap</button>
         </div>
-
         <div id="adminAuthForm" style="display:none;">
             <div class="error-msg" id="adminErrorMsg">Giriş Başarısız! Kullanıcı adı veya şifre yanlış.</div>
             <label style="font-size:12px; color:#8a8f99;">Admin Kullanıcı Adı</label>
@@ -363,21 +312,17 @@ VIDRAN GAMES - Complete Web Portal
     <div class="modal-card">
         <button class="modal-close" onclick="closeAddGameModal()">✕</button>
         <h3 style="color:#fff; margin-bottom:15px;">👑 Oyun / Dosya Yükle (Admin)</h3>
-        
         <label style="font-size:11px; color:#8a8f99;">Oyun Adı</label>
         <input type="text" id="newGameTitle" placeholder="Örn: Subway Surfers Özel">
-
         <label style="font-size:11px; color:#8a8f99;">Kategori</label>
         <input type="text" id="newGameCategory" placeholder="Aksiyon / Yarış / Bulmaca">
-
-        <label style="font-size:11px; color:#8a8f99;">Oyun Dosyası Seç (.html veya .zip)</label>
-        <input type="file" id="newGameFile" accept=".html,.zip" style="padding:6px; background:#161922; cursor:pointer;">
-
+        <label style="font-size:11px; color:#8a8f99;">Oyun Dosyası Seç (.html)</label>
+        <input type="file" id="newGameFile" accept=".html" style="padding:6px; background:#161922; cursor:pointer;">
         <button class="modal-btn" style="margin-top:10px;" onclick="submitUploadedGame()">Oyunu Siteye Ekle</button>
     </div>
 </div>
 
-<!-- 2048 Oyun Modalı -->
+<!-- 2048 Modalı -->
 <div class="modal-overlay" id="game2048Modal">
     <div class="modal-card" style="width:320px; text-align:center;">
         <button class="modal-close" onclick="close2048Game()">✕</button>
@@ -403,138 +348,187 @@ VIDRAN GAMES - Complete Web Portal
 <footer>VIDRAN GAMES · ULTIMATE ARCADE PORTAL © 2026</footer>
 
 <script>
-    var currentUser = null; 
+    var currentUser = null;
     var myLibrary = ["2048 Klasik"];
     var currentGame = {};
+    var activeCategory = 'Hepsi';
 
+    /* Siteyle birlikte gelen oyunlar. Yeni sabit oyun eklemek için: games/KLASOR/index.html yükle
+       ve buraya { title, price, category, color, url: "/games/KLASOR/" } satırı ekle. */
     var storeGames = [
-        { title: "Subway Surfers 3D", price: "Ücretsiz", category: "Aksiyon", color: "#d35400", fileContent: null, is3DSubway: true },
-        { title: "Temple Run 2", price: "Ücretsiz", category: "Aksiyon", color: "#c0392b", fileContent: null },
-        { title: "Smash Karts", price: "Ücretsiz", category: "Yarış", color: "#2980b9", fileContent: null },
-        { title: "Moto X3M", price: "Ücretsiz", category: "Yarış", color: "#8e44ad", fileContent: null },
-        { title: "Stickman Hook", price: "Ücretsiz", category: "Aksiyon", color: "#16a085", fileContent: null },
-        { title: "Fireboy and Watergirl", price: "Ücretsiz", category: "Bulmaca", color: "#e74c3c", fileContent: null },
-        { title: "Monkey Mart", price: "Ücretsiz", category: "Aksiyon", color: "#27ae60", fileContent: null },
-        { title: "Drive Mad", price: "Ücretsiz", category: "Yarış", color: "#27ae60", fileContent: null },
-        { title: "Venge.io", price: "Ücretsiz", category: "Aksiyon", color: "#34495e", fileContent: null },
-        { title: "Level Devil", price: "Ücretsiz", category: "Bulmaca", color: "#8e44ad", fileContent: null },
-        { title: "Brain Test", price: "Ücretsiz", category: "Bulmaca", color: "#2980b9", fileContent: null },
-        { title: "Drift Boss", price: "Ücretsiz", category: "Yarış", color: "#d35400", fileContent: null },
-        { title: "Basketball Stars", price: "Ücretsiz", category: "Spor", color: "#e67e22", fileContent: null },
-        { title: "Soccer Skills World Cup", price: "Ücretsiz", category: "Spor", color: "#27ae60", fileContent: null },
-        { title: "House of Hazards", price: "Ücretsiz", category: "Aksiyon", color: "#9b59b6", fileContent: null },
-        { title: "Rodeo Stampede", price: "Ücretsiz", category: "Aksiyon", color: "#16a085", fileContent: null },
-        { title: "Blocky Blast Puzzle", price: "Ücretsiz", category: "Bulmaca", color: "#f39c12", fileContent: null },
-        { title: "Aquapark.io", price: "Ücretsiz", category: "Yarış", color: "#2980b9", fileContent: null },
-        { title: "Penalty Shooters", price: "Ücretsiz", category: "Spor", color: "#1abc9c", fileContent: null },
-        { title: "Tag 2", price: "Ücretsiz", category: "Aksiyon", color: "#f1c40f", fileContent: null },
-        { title: "Narrow.one", price: "Ücretsiz", category: "Aksiyon", color: "#2c3e50", fileContent: null },
-        { title: "Gold Digger FRVR", price: "Ücretsiz", category: "Bulmaca", color: "#d4ac0d", fileContent: null },
-        { title: "TNT Sandbox", price: "Ücretsiz", category: "Bulmaca", color: "#c0392b", fileContent: null },
-        { title: "2048 Klasik", price: "Ücretsiz", category: "Bulmaca", color: "#e74c3c", fileContent: null }
+        { title: "Subway Surfers 3D", price: "Ücretsiz", category: "Aksiyon", color: "#d35400", is3DSubway: true },
+        { title: "Temple Run 2", price: "Ücretsiz", category: "Aksiyon", color: "#c0392b" },
+        { title: "Smash Karts", price: "Ücretsiz", category: "Yarış", color: "#2980b9" },
+        { title: "Moto X3M", price: "Ücretsiz", category: "Yarış", color: "#8e44ad" },
+        { title: "Yıldız Yakala", price: "Ücretsiz", category: "Aksiyon", color: "#e8a800", url: "/games/yildiz-yakala/" },
+        { title: "Stickman Hook", price: "Ücretsiz", category: "Aksiyon", color: "#16a085" },
+        { title: "Fireboy and Watergirl", price: "Ücretsiz", category: "Bulmaca", color: "#e74c3c" },
+        { title: "Monkey Mart", price: "Ücretsiz", category: "Aksiyon", color: "#27ae60" },
+        { title: "Drive Mad", price: "Ücretsiz", category: "Yarış", color: "#27ae60" },
+        { title: "Venge.io", price: "Ücretsiz", category: "Aksiyon", color: "#34495e" },
+        { title: "Level Devil", price: "Ücretsiz", category: "Bulmaca", color: "#8e44ad" },
+        { title: "Brain Test", price: "Ücretsiz", category: "Bulmaca", color: "#2980b9" },
+        { title: "Drift Boss", price: "Ücretsiz", category: "Yarış", color: "#d35400" },
+        { title: "Basketball Stars", price: "Ücretsiz", category: "Spor", color: "#e67e22" },
+        { title: "Soccer Skills World Cup", price: "Ücretsiz", category: "Spor", color: "#27ae60" },
+        { title: "House of Hazards", price: "Ücretsiz", category: "Aksiyon", color: "#9b59b6" },
+        { title: "Rodeo Stampede", price: "Ücretsiz", category: "Aksiyon", color: "#16a085" },
+        { title: "Blocky Blast Puzzle", price: "Ücretsiz", category: "Bulmaca", color: "#f39c12" },
+        { title: "Aquapark.io", price: "Ücretsiz", category: "Yarış", color: "#2980b9" },
+        { title: "Penalty Shooters", price: "Ücretsiz", category: "Spor", color: "#1abc9c" },
+        { title: "Tag 2", price: "Ücretsiz", category: "Aksiyon", color: "#f1c40f" },
+        { title: "Narrow.one", price: "Ücretsiz", category: "Aksiyon", color: "#2c3e50" },
+        { title: "Gold Digger FRVR", price: "Ücretsiz", category: "Bulmaca", color: "#d4ac0d" },
+        { title: "TNT Sandbox", price: "Ücretsiz", category: "Bulmaca", color: "#c0392b" },
+        { title: "2048 Klasik", price: "Ücretsiz", category: "Bulmaca", color: "#e74c3c" }
     ];
+
+    /* ---- Admin panelinden yüklenen oyunlar: bu tarayıcıda kalıcı saklanır ---- */
+    function saveUploadedGames() {
+        try {
+            var up = storeGames.filter(function(g) { return g.uploaded; });
+            localStorage.setItem('vidran-uploaded', JSON.stringify(up));
+        } catch(e) { alert("Tarayıcı hafızası dolu, oyun kalıcı kaydedilemedi."); }
+    }
+    function loadUploadedGames() {
+        try {
+            var up = JSON.parse(localStorage.getItem('vidran-uploaded') || '[]');
+            up.forEach(function(g) { storeGames.push(g); });
+        } catch(e) {}
+    }
+
+    function findGame(title) {
+        for (var i = 0; i < storeGames.length; i++) if (storeGames[i].title === title) return storeGames[i];
+        return null;
+    }
+    function openGameByTitle(title) {
+        var g = findGame(title);
+        if (g) openGame(g);
+    }
 
     function renderStoreGames() {
         var grid = document.getElementById('mainGameGrid');
-        if(!grid) return;
+        if (!grid) return;
         grid.innerHTML = "";
-        for(var i=0; i<storeGames.length; i++) {
+        for (var i = 0; i < storeGames.length; i++) {
             var g = storeGames[i];
             var card = document.createElement('div');
             card.className = 'game-card';
             card.setAttribute('data-category', g.category);
             card.setAttribute('data-title', g.title.toLowerCase());
-            card.onclick = (function(game) {
-                return function() { openGame(game); };
-            })(g);
+            card.onclick = (function(game) { return function() { openGame(game); }; })(g);
 
             var adminActions = "";
-            if(currentUser === 'admin') {
-                adminActions = '<div class="admin-card-actions" style="display:flex;">' +
-                    '<button onclick="event.stopPropagation(); deleteGame(' + i + ')">Sil</button>' +
-                    '</div>';
+            if (currentUser === 'admin' && g.uploaded) {
+                adminActions = '<div class="admin-card-actions" style="display:flex;"><button onclick="event.stopPropagation(); deleteGame(' + i + ')">Sil</button></div>';
             }
-
             card.innerHTML = adminActions +
-                '<div class="game-banner" style="background: ' + (g.color || '#f39c12') + ';">' + g.title + '</div>' +
-                '<div class="game-details"><h4>' + g.title + '</h4><div class="tags">' + g.category + '</div><div class="price">' + g.price + '</div></div>';
+                '<div class="game-banner" style="background:' + (g.color || '#f39c12') + ';">' + escapeHtml(g.title) + '</div>' +
+                '<div class="game-details"><h4>' + escapeHtml(g.title) + '</h4><div class="tags">' + escapeHtml(g.category) + '</div><div class="price">' + g.price + '</div></div>';
             grid.appendChild(card);
         }
+        applyFilters();
+    }
+
+    function renderLibrary() {
+        var grid = document.getElementById('libraryGrid');
+        grid.innerHTML = "";
+        myLibrary.forEach(function(name) {
+            var g = findGame(name) || { title: name, color: "#e74c3c" };
+            var card = document.createElement('div');
+            card.className = 'game-card';
+            card.style.cssText = 'padding:15px; display:flex; gap:15px; align-items:center; cursor:default;';
+            card.innerHTML = '<div style="width:50px; height:50px; background:' + (g.color || '#e74c3c') + '; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; flex-shrink:0;">🎮</div>' +
+                '<div><h4 style="color:#fff;">' + escapeHtml(name) + '</h4></div>';
+            var btn = document.createElement('button');
+            btn.className = 'btn-register';
+            btn.style.cssText = 'margin-top:6px; padding:4px 10px;';
+            btn.innerText = 'Oyna';
+            btn.onclick = function() { openGameByTitle(name); };
+            card.lastChild.appendChild(btn);
+            grid.appendChild(card);
+        });
     }
 
     function switchPage(pageId) {
         var pages = document.querySelectorAll('.page-view');
-        for(var i=0; i<pages.length; i++) {
+        for (var i = 0; i < pages.length; i++) {
             pages[i].classList.remove('active');
             pages[i].style.display = 'none';
         }
-        
         var target = document.getElementById('page-' + pageId);
-        if(target) {
-            target.style.display = 'block';
-            target.classList.add('active');
-        }
+        if (target) { target.style.display = 'block'; target.classList.add('active'); }
 
         var btns = document.querySelectorAll('.nav-links button');
-        for(var j=0; j<btns.length; j++) btns[j].classList.remove('active');
+        for (var j = 0; j < btns.length; j++) btns[j].classList.remove('active');
         var activeNav = document.getElementById('nav' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
-        if(activeNav) activeNav.classList.add('active');
+        if (activeNav) activeNav.classList.add('active');
 
-        if(pageId === 'profile') {
-            document.getElementById('statLibCount').innerText = myLibrary.length;
-        }
+        if (pageId === 'profile') document.getElementById('statLibCount').innerText = myLibrary.length;
+        if (pageId === 'library') renderLibrary();
+    }
+
+    function leaveDetail() {
+        stopSubwayGame();
+        document.getElementById('gamePlayContainer').innerHTML = '';
+        switchPage('store');
     }
 
     function openGame(game) {
-        if(game.title === "2048 Klasik") {
-            start2048Game();
-            return;
-        }
+        if (game.title === "2048 Klasik") { start2048Game(); return; }
         currentGame = game;
         document.getElementById('detail-title').innerText = game.title;
         document.getElementById('detail-price').innerText = game.price;
-        
+
         var standardBanner = document.getElementById('detail-banner');
         var subwayContainer = document.getElementById('subwayCanvasContainer');
+        var play = document.getElementById('gamePlayContainer');
 
+        stopSubwayGame();
         if (game.is3DSubway) {
             standardBanner.style.display = 'none';
             subwayContainer.style.display = 'block';
+            switchPage('detail');
             startSubwayGame();
-        } else {
-            subwayContainer.style.display = 'none';
-            stopSubwayGame();
-            standardBanner.style.display = 'flex';
-            document.getElementById('gamePlayContainer').innerHTML = `
-                <div style="font-size:48px; margin-bottom:10px;">🎮</div>
-                <div id="detailGameNameText" style="margin-bottom:15px; color:#f39c12;">${game.title} Oyunu Hazır!</div>
-                <button class="btn-register" style="padding: 12px 28px; font-size: 15px;" onclick="launchUploadedGame()">Oyunu Başlat</button>
-            `;
+            return;
         }
 
+        subwayContainer.style.display = 'none';
+        standardBanner.style.display = 'flex';
+
+        if (game.url) {
+            play.innerHTML = '<iframe src="' + game.url + '" title="' + escapeHtml(game.title) + '" style="width:100%;height:100%;border:none;background:#fff;"></iframe>';
+        } else {
+            play.innerHTML =
+                '<div style="font-size:48px; margin-bottom:10px;">🎮</div>' +
+                '<div style="margin-bottom:15px; color:#f39c12;">' + escapeHtml(game.title) + ' Oyunu Hazır!</div>' +
+                '<button class="btn-register" style="padding:12px 28px; font-size:15px;" onclick="launchUploadedGame()">Oyunu Başlat</button>';
+        }
         switchPage('detail');
     }
 
     function launchUploadedGame() {
         if (currentGame.fileContent) {
-            var container = document.getElementById('gamePlayContainer');
-            container.innerHTML = '<iframe srcdoc="' + escapeHtml(currentGame.fileContent) + '" style="width:100%; height:100%; border:none;"></iframe>';
+            document.getElementById('gamePlayContainer').innerHTML =
+                '<iframe srcdoc="' + escapeHtml(currentGame.fileContent) + '" style="width:100%; height:100%; border:none; background:#fff;"></iframe>';
         } else {
             alert(currentGame.title + " simülasyonu başlatıldı!");
         }
     }
 
     function escapeHtml(text) {
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function addToLibrary() {
-        if(myLibrary.indexOf(currentGame.title) === -1) {
+        if (myLibrary.indexOf(currentGame.title) === -1) {
             myLibrary.push(currentGame.title);
             alert(currentGame.title + " kütüphanenize eklendi!");
         } else {
             alert("Bu oyun zaten kütüphanenizde var!");
         }
+        stopSubwayGame();
+        document.getElementById('gamePlayContainer').innerHTML = '';
         switchPage('library');
     }
 
@@ -542,14 +536,11 @@ VIDRAN GAMES - Complete Web Portal
         var newName = document.getElementById('settingsNameInput').value.trim();
         var newBio = document.getElementById('settingsBioInput').value.trim();
         var newAvatar = document.getElementById('settingsAvatarSelect').value;
-
-        if(newName) {
+        if (newName) {
             document.getElementById('profileNameDisplay').innerText = newName;
             document.getElementById('navUsernameDisplay').innerText = newName;
         }
-        if(newBio) {
-            document.getElementById('profileBioDisplay').innerText = newBio;
-        }
+        if (newBio) document.getElementById('profileBioDisplay').innerText = newBio;
         document.getElementById('profileAvatarIcon').innerText = newAvatar;
         alert("Profil ayarlarınız başarıyla güncellendi!");
     }
@@ -562,17 +553,11 @@ VIDRAN GAMES - Complete Web Portal
     function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
 
     function switchAuthTab(tab) {
-        if(tab === 'player') {
-            document.getElementById('playerAuthForm').style.display = 'block';
-            document.getElementById('adminAuthForm').style.display = 'none';
-            document.getElementById('tabPlayerBtn').className = 'tab-btn active';
-            document.getElementById('tabAdminBtn').className = 'tab-btn';
-        } else {
-            document.getElementById('playerAuthForm').style.display = 'none';
-            document.getElementById('adminAuthForm').style.display = 'block';
-            document.getElementById('tabPlayerBtn').className = 'tab-btn';
-            document.getElementById('tabAdminBtn').className = 'tab-btn active';
-        }
+        var isPlayer = tab === 'player';
+        document.getElementById('playerAuthForm').style.display = isPlayer ? 'block' : 'none';
+        document.getElementById('adminAuthForm').style.display = isPlayer ? 'none' : 'block';
+        document.getElementById('tabPlayerBtn').className = 'tab-btn' + (isPlayer ? ' active' : '');
+        document.getElementById('tabAdminBtn').className = 'tab-btn' + (isPlayer ? '' : ' active');
     }
 
     function handlePlayerLogin() {
@@ -590,8 +575,7 @@ VIDRAN GAMES - Complete Web Portal
     function handleAdminLogin() {
         var user = document.getElementById('adminUsernameInput').value.trim();
         var pass = document.getElementById('adminPasswordInput').value.trim();
-
-        if(user === 'yusuf.erdem' && pass === '172839') {
+        if (user === 'yusuf.erdem' && pass === '172839') {
             currentUser = 'admin';
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('userProfileNav').style.display = 'flex';
@@ -610,71 +594,70 @@ VIDRAN GAMES - Complete Web Portal
 
     function openAddGameModal() { document.getElementById('addGameModal').classList.add('active'); }
     function closeAddGameModal() { document.getElementById('addGameModal').classList.remove('active'); }
-    
+
     function submitUploadedGame() {
         var title = document.getElementById('newGameTitle').value.trim();
         var cat = document.getElementById('newGameCategory').value.trim() || 'Aksiyon';
         var fileInput = document.getElementById('newGameFile');
+        if (!title) { alert("Lütfen oyun adını girin!"); return; }
 
-        if(!title) {
-            alert("Lütfen oyun adını girin!");
-            return;
-        }
-
-        if(fileInput.files.length > 0) {
-            var file = fileInput.files[0];
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var content = e.target.result;
-                storeGames.unshift({ title: title, price: "Ücretsiz", category: cat, color: "#16a085", fileContent: content });
-                renderStoreGames();
-                closeAddGameModal();
-                alert(title + " oyunu başarıyla yüklendi ve sisteme eklendi!");
-            };
-            reader.readAsText(file);
-        } else {
-            storeGames.unshift({ title: title, price: "Ücretsiz", category: cat, color: "#16a085", fileContent: null });
+        function addGame(content) {
+            storeGames.push({ title: title, price: "Ücretsiz", category: cat, color: "#16a085", fileContent: content, uploaded: true });
+            saveUploadedGames();
             renderStoreGames();
             closeAddGameModal();
+            document.getElementById('newGameTitle').value = '';
+            document.getElementById('newGameCategory').value = '';
+            fileInput.value = '';
             alert(title + " oyunu eklendi!");
+        }
+
+        if (fileInput.files.length > 0) {
+            var reader = new FileReader();
+            reader.onload = function(e) { addGame(e.target.result); };
+            reader.readAsText(fileInput.files[0]);
+        } else {
+            addGame(null);
         }
     }
 
     function deleteGame(idx) {
         storeGames.splice(idx, 1);
+        saveUploadedGames();
         renderStoreGames();
     }
 
+    /* ---- Filtre ve arama birlikte çalışır ---- */
+    function applyFilters() {
+        var q = (document.getElementById('searchInput').value || '').toLowerCase();
+        var cards = document.querySelectorAll('#mainGameGrid .game-card');
+        for (var i = 0; i < cards.length; i++) {
+            var c = cards[i].getAttribute('data-category');
+            var t = cards[i].getAttribute('data-title');
+            var okCat = (activeCategory === 'Hepsi' || c.indexOf(activeCategory) !== -1);
+            var okSearch = t.indexOf(q) !== -1;
+            cards[i].style.display = (okCat && okSearch) ? 'block' : 'none';
+        }
+    }
     function filterCategory(cat, btn) {
         var btns = document.querySelectorAll('.cat-btn');
-        for(var i=0; i<btns.length; i++) btns[i].className = 'cat-btn';
+        for (var i = 0; i < btns.length; i++) btns[i].className = 'cat-btn';
         btn.className = 'cat-btn active';
-
-        var cards = document.querySelectorAll('#mainGameGrid .game-card');
-        for(var j=0; j<cards.length; j++) {
-            var c = cards[j].getAttribute('data-category');
-            cards[j].style.display = (cat === 'Hepsi' || c.indexOf(cat) !== -1) ? 'block' : 'none';
-        }
+        activeCategory = cat;
+        applyFilters();
     }
-
-    function searchGames(q) {
-        var cards = document.querySelectorAll('#mainGameGrid .game-card');
-        for(var i=0; i<cards.length; i++) {
-            var t = cards[i].getAttribute('data-title');
-            cards[i].style.display = t.indexOf(q.toLowerCase()) !== -1 ? 'block' : 'none';
-        }
-    }
+    function searchGames() { applyFilters(); }
 
     function start2048Game() {
-        document.getElementById('game2048Modal').classList.add('active'); 
-        init2048Game(); 
+        document.getElementById('game2048Modal').classList.add('active');
+        init2048Game();
     }
     function close2048Game() { document.getElementById('game2048Modal').classList.remove('active'); }
     function init2048Game() {
         var board = [[2,0,0,0],[0,4,0,0],[0,0,2,0],[0,0,0,8]];
         var b = document.getElementById('game2048Board'); b.innerHTML = '';
-        for(var r=0; r<4; r++) {
-            for(var c=0; c<4; c++) {
+        for (var r = 0; r < 4; r++) {
+            for (var c = 0; c < 4; c++) {
                 var val = board[r][c];
                 var tile = document.createElement('div');
                 tile.className = 'tile ' + (val > 0 ? 'tile-' + val : '');
@@ -684,21 +667,15 @@ VIDRAN GAMES - Complete Web Portal
         }
     }
 
-    function toggleAIChat() {
-        var box = document.getElementById('aiChatBox');
-        box.classList.toggle('active');
-    }
-
+    function toggleAIChat() { document.getElementById('aiChatBox').classList.toggle('active'); }
     function sendAIMessage() {
         var inp = document.getElementById('aiInput');
         var txt = inp.value.trim();
-        if(!txt) return;
-
+        if (!txt) return;
         var box = document.getElementById('aiMessages');
         var u = document.createElement('div'); u.className = 'msg user'; u.innerText = txt;
         box.appendChild(u);
         inp.value = '';
-
         setTimeout(function() {
             var a = document.createElement('div'); a.className = 'msg ai';
             a.innerText = "VIDRAN AI: Mağaza ve oyunlar hakkında yardımcı olmaktan mutluluk duyarım!";
@@ -707,32 +684,20 @@ VIDRAN GAMES - Complete Web Portal
         }, 400);
     }
 
-    /* ---------------------------------------------------------------------
-       3D SUBWAY SURFERS ENGINE (THREE.JS)
-    --------------------------------------------------------------------- */
-    var scene, camera, renderer, player, obstacles = [], coins = [];
-    var currentLane = 0; // -1: Sol, 0: Orta, 1: Sağ
-    var targetX = 0;
-    var score = 0;
-    var gameRunning = false;
-    var isJumping = false;
-    var jumpVelocity = 0;
-    var animFrameId;
+    /* ---------------- 3D SUBWAY SURFERS (THREE.JS) ---------------- */
+    var scene, camera, renderer, player, obstacles = [];
+    var currentLane = 0, targetX = 0, score = 0;
+    var gameRunning = false, isJumping = false, jumpVelocity = 0, animFrameId;
 
     function startSubwayGame() {
         var container = document.getElementById('subwayCanvasContainer');
         container.innerHTML = '<div class="subway-ui">SKOR: <span id="subwayScore">0</span></div><div class="subway-controls">Sol/Sağ Ok Tuşları: Şerit Değiştir | Yukarı Ok: Zıpla</div>';
 
-        score = 0;
-        currentLane = 0;
-        targetX = 0;
-        obstacles = [];
-        coins = [];
+        score = 0; currentLane = 0; targetX = 0; obstacles = []; isJumping = false;
         gameRunning = true;
 
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x11141c);
-
         camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
         camera.position.set(0, 3, 6);
         camera.lookAt(0, 1, -5);
@@ -746,56 +711,38 @@ VIDRAN GAMES - Complete Web Portal
         scene.add(light);
         scene.add(new THREE.AmbientLight(0x404040, 1.5));
 
-        // Zemin (Pist)
-        var trackGeo = new THREE.PlaneGeometry(6, 200);
-        var trackMat = new THREE.MeshBasicMaterial({ color: 0x222531 });
-        var track = new THREE.Mesh(trackGeo, trackMat);
+        var track = new THREE.Mesh(new THREE.PlaneGeometry(6, 200), new THREE.MeshBasicMaterial({ color: 0x222531 }));
         track.rotation.x = -Math.PI / 2;
         track.position.z = -90;
         scene.add(track);
 
-        // Şerit Çizgileri
-        for (var l of [-1, 1]) {
-            var lineGeo = new THREE.PlaneGeometry(0.1, 200);
-            var lineMat = new THREE.MeshBasicMaterial({ color: 0xf39c12 });
-            var line = new THREE.Mesh(lineGeo, lineMat);
+        [-1, 1].forEach(function(l) {
+            var line = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 200), new THREE.MeshBasicMaterial({ color: 0xf39c12 }));
             line.rotation.x = -Math.PI / 2;
             line.position.set(l * 2, 0.01, -90);
             scene.add(line);
-        }
+        });
 
-        // Karakter (Player)
-        var pGeo = new THREE.BoxGeometry(0.6, 1.2, 0.6);
-        var pMat = new THREE.MeshLambertMaterial({ color: 0xf39c12 });
-        player = new THREE.Mesh(pGeo, pMat);
+        player = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 0.6), new THREE.MeshLambertMaterial({ color: 0xf39c12 }));
         player.position.set(0, 0.6, 0);
         scene.add(player);
 
         window.removeEventListener('keydown', handleSubwayInput);
         window.addEventListener('keydown', handleSubwayInput);
-
         animateSubway();
     }
 
     function handleSubwayInput(e) {
         if (!gameRunning) return;
-        if (e.key === "ArrowLeft" && currentLane > -1) {
-            currentLane--;
-            targetX = currentLane * 2;
-        } else if (e.key === "ArrowRight" && currentLane < 1) {
-            currentLane++;
-            targetX = currentLane * 2;
-        } else if (e.key === "ArrowUp" && !isJumping) {
-            isJumping = true;
-            jumpVelocity = 0.2;
-        }
+        if (e.key === "ArrowLeft" && currentLane > -1) { currentLane--; targetX = currentLane * 2; }
+        else if (e.key === "ArrowRight" && currentLane < 1) { currentLane++; targetX = currentLane * 2; }
+        else if (e.key === "ArrowUp" && !isJumping) { isJumping = true; jumpVelocity = 0.2; }
+        if (e.key.indexOf("Arrow") === 0) e.preventDefault();
     }
 
     function spawnObstacle() {
         var lane = Math.floor(Math.random() * 3) - 1;
-        var geo = new THREE.BoxGeometry(1.2, 1, 0.8);
-        var mat = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
-        var obs = new THREE.Mesh(geo, mat);
+        var obs = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1, 0.8), new THREE.MeshLambertMaterial({ color: 0xe74c3c }));
         obs.position.set(lane * 2, 0.5, -50);
         scene.add(obs);
         obstacles.push(obs);
@@ -805,47 +752,34 @@ VIDRAN GAMES - Complete Web Portal
         if (!gameRunning) return;
         animFrameId = requestAnimationFrame(animateSubway);
 
-        // Smooth lane change
         player.position.x += (targetX - player.position.x) * 0.2;
-
-        // Jump gravity
         if (isJumping) {
             player.position.y += jumpVelocity;
             jumpVelocity -= 0.012;
-            if (player.position.y <= 0.6) {
-                player.position.y = 0.6;
-                isJumping = false;
-            }
+            if (player.position.y <= 0.6) { player.position.y = 0.6; isJumping = false; }
         }
-
-        // Spawn obstacles
         if (Math.random() < 0.03) spawnObstacle();
 
-        // Update obstacles
         for (var i = obstacles.length - 1; i >= 0; i--) {
             var obs = obstacles[i];
             obs.position.z += 0.4;
-
-            // Collision detection
             if (Math.abs(obs.position.z - player.position.z) < 0.6 &&
                 Math.abs(obs.position.x - player.position.x) < 0.6 &&
                 player.position.y < 1.0) {
                 gameRunning = false;
-                alert("Oyun Bitti! Toplam Skor: " + Math.floor(score));
-                startSubwayGame();
+                var finalScore = Math.floor(score);
+                setTimeout(function() {
+                    alert("Oyun Bitti! Toplam Skor: " + finalScore);
+                    if (document.getElementById('subwayCanvasContainer').style.display === 'block') startSubwayGame();
+                }, 20);
                 return;
             }
-
-            if (obs.position.z > 5) {
-                scene.remove(obs);
-                obstacles.splice(i, 1);
-            }
+            if (obs.position.z > 5) { scene.remove(obs); obstacles.splice(i, 1); }
         }
 
         score += 0.1;
-        var scoreElem = document.getElementById('subwayScore');
-        if (scoreElem) scoreElem.innerText = Math.floor(score);
-
+        var el = document.getElementById('subwayScore');
+        if (el) el.innerText = Math.floor(score);
         renderer.render(scene, camera);
     }
 
@@ -856,7 +790,10 @@ VIDRAN GAMES - Complete Web Portal
     }
 
     window.onload = function() {
+        loadUploadedGames();
         renderStoreGames();
         switchPage('store');
     };
 </script>
+</body>
+</html>
