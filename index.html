@@ -167,6 +167,7 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         <div id="userProfileNav" style="display:none; align-items:center; gap:8px; cursor:pointer;" onclick="switchPage('profile')">
             <span id="adminBadgeTag" style="background:#e74c3c; color:#fff; padding:2px 6px; border-radius:3px; font-size:9px; font-weight:bold; display:none;">ADMİN</span>
             <span id="navUsernameDisplay" style="font-size:12px; color:#fff; font-weight:bold;">VidranPlayer</span>
+            <button id="logoutBtn" class="btn-login" style="display:none; padding:4px 10px;" onclick="event.stopPropagation(); adminLogout()">Çıkış</button>
         </div>
     </div>
 </nav>
@@ -297,11 +298,11 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
             <button class="modal-btn" onclick="handlePlayerLogin()">Giriş Yap</button>
         </div>
         <div id="adminAuthForm" style="display:none;">
-            <div class="error-msg" id="adminErrorMsg">Giriş Başarısız! Kullanıcı adı veya şifre yanlış.</div>
-            <label style="font-size:12px; color:#8a8f99;">Admin Kullanıcı Adı</label>
-            <input type="text" id="adminUsernameInput" placeholder="Kullanıcı Adı">
+            <div class="error-msg" id="adminErrorMsg">Giriş başarısız! E-posta veya şifre yanlış.</div>
+            <label style="font-size:12px; color:#8a8f99;">Admin E-posta</label>
+            <input type="email" id="adminUsernameInput" placeholder="ornek@mail.com" autocomplete="username">
             <label style="font-size:12px; color:#8a8f99;">Şifre</label>
-            <input type="password" id="adminPasswordInput" placeholder="••••••••">
+            <input type="password" id="adminPasswordInput" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') handleAdminLogin()">
             <button class="modal-btn" style="background:#e74c3c; color:#fff;" onclick="handleAdminLogin()">Admin Yetkisini Al</button>
         </div>
     </div>
@@ -316,7 +317,7 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         <input type="text" id="newGameTitle" placeholder="Örn: Subway Surfers Özel">
         <label style="font-size:11px; color:#8a8f99;">Kategori</label>
         <input type="text" id="newGameCategory" placeholder="Aksiyon / Yarış / Bulmaca">
-        <label style="font-size:11px; color:#8a8f99;">Oyun Dosyası Seç (.html)</label>
+        <label style="font-size:11px; color:#8a8f99;">Oyun Dosyası Seç (.html, tek dosya, en fazla ~5 MB)</label>
         <input type="file" id="newGameFile" accept=".html" style="padding:6px; background:#161922; cursor:pointer;">
         <button class="modal-btn" style="margin-top:10px;" onclick="submitUploadedGame()">Oyunu Siteye Ekle</button>
     </div>
@@ -383,18 +384,62 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         { title: "2048 Klasik", price: "Ücretsiz", category: "Bulmaca", color: "#e74c3c" }
     ];
 
-    /* ---- Admin panelinden yüklenen oyunlar: bu tarayıcıda kalıcı saklanır ---- */
-    function saveUploadedGames() {
-        try {
-            var up = storeGames.filter(function(g) { return g.uploaded; });
-            localStorage.setItem('vidran-uploaded', JSON.stringify(up));
-        } catch(e) { alert("Tarayıcı hafızası dolu, oyun kalıcı kaydedilemedi."); }
+    /* ---------------- SUPABASE (ortak, kalıcı oyun listesi) ---------------- */
+    var SB_URL = "https://cswlspekkvldtxifhqqy.supabase.co";
+    var SB_KEY = "sb_publishable_b18b1uMLF_RtWN9f2XdwZg_jUF6SOly";
+    var session = null;
+
+    function sbHeaders(extra) {
+        var h = { "apikey": SB_KEY, "Content-Type": "application/json" };
+        if (session && session.access_token) h["Authorization"] = "Bearer " + session.access_token;
+        for (var k in (extra || {})) h[k] = extra[k];
+        return h;
     }
-    function loadUploadedGames() {
+    function storeSession(d, email) {
+        session = {
+            access_token: d.access_token,
+            refresh_token: d.refresh_token,
+            email: (d.user && d.user.email) || email || "",
+            expires_at: Date.now() + (d.expires_in || 3600) * 1000 - 60000
+        };
+        try { localStorage.setItem('vidran-session', JSON.stringify(session)); } catch(e) {}
+    }
+    function clearSession() {
+        session = null;
+        try { localStorage.removeItem('vidran-session'); } catch(e) {}
+    }
+    async function sbLogin(email, pass) {
+        var r = await fetch(SB_URL + "/auth/v1/token?grant_type=password", {
+            method: "POST",
+            headers: { "apikey": SB_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: pass })
+        });
+        if (!r.ok) throw new Error("login");
+        storeSession(await r.json(), email);
+    }
+    async function ensureSession() {
+        if (!session) return false;
+        if (Date.now() < session.expires_at) return true;
         try {
-            var up = JSON.parse(localStorage.getItem('vidran-uploaded') || '[]');
-            up.forEach(function(g) { storeGames.push(g); });
-        } catch(e) {}
+            var r = await fetch(SB_URL + "/auth/v1/token?grant_type=refresh_token", {
+                method: "POST",
+                headers: { "apikey": SB_KEY, "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh_token: session.refresh_token })
+            });
+            if (!r.ok) throw new Error("refresh");
+            storeSession(await r.json(), session.email);
+            return true;
+        } catch (e) { clearSession(); return false; }
+    }
+    async function loadUploadedGames() {
+        try {
+            var r = await fetch(SB_URL + "/rest/v1/games?select=id,title,category,color&order=created_at.asc", { headers: sbHeaders() });
+            if (!r.ok) return;
+            var rows = await r.json();
+            rows.forEach(function(g) {
+                storeGames.push({ title: g.title, price: "Ücretsiz", category: g.category, color: g.color || "#16a085", uploaded: true, dbId: g.id });
+            });
+        } catch (e) {}
     }
 
     function findGame(title) {
@@ -507,12 +552,20 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         switchPage('detail');
     }
 
-    function launchUploadedGame() {
-        if (currentGame.fileContent) {
+    async function launchUploadedGame() {
+        var game = currentGame;
+        if (game.dbId && game.fileContent === undefined) {
+            try {
+                var r = await fetch(SB_URL + "/rest/v1/games?id=eq." + game.dbId + "&select=content", { headers: sbHeaders() });
+                var rows = await r.json();
+                game.fileContent = (rows[0] && rows[0].content) || null;
+            } catch (e) { game.fileContent = null; }
+        }
+        if (game.fileContent) {
             document.getElementById('gamePlayContainer').innerHTML =
-                '<iframe srcdoc="' + escapeHtml(currentGame.fileContent) + '" style="width:100%; height:100%; border:none; background:#fff;"></iframe>';
+                '<iframe srcdoc="' + escapeHtml(game.fileContent) + '" style="width:100%; height:100%; border:none; background:#fff;"></iframe>';
         } else {
-            alert(currentGame.title + " simülasyonu başlatıldı!");
+            alert(game.title + " için oyun dosyası yok.");
         }
     }
 
@@ -572,59 +625,98 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         renderStoreGames();
     }
 
-    function handleAdminLogin() {
-        var user = document.getElementById('adminUsernameInput').value.trim();
-        var pass = document.getElementById('adminPasswordInput').value.trim();
-        if (user === 'yusuf.erdem' && pass === '172839') {
-            currentUser = 'admin';
-            document.getElementById('authButtons').style.display = 'none';
-            document.getElementById('userProfileNav').style.display = 'flex';
-            document.getElementById('adminBadgeTag').style.display = 'inline-block';
-            document.getElementById('navAdminAdd').style.display = 'inline-block';
-            document.getElementById('navUsernameDisplay').innerText = 'Admin';
-            document.getElementById('profileNameDisplay').innerText = 'VidranAdmin 👑';
-            document.getElementById('profileAvatarIcon').innerText = '👑';
-            document.getElementById('settingsNameInput').value = 'VidranAdmin';
+    function setAdminUI() {
+        currentUser = 'admin';
+        document.getElementById('authButtons').style.display = 'none';
+        document.getElementById('userProfileNav').style.display = 'flex';
+        document.getElementById('adminBadgeTag').style.display = 'inline-block';
+        document.getElementById('navAdminAdd').style.display = 'inline-block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('navUsernameDisplay').innerText = 'Admin';
+        document.getElementById('profileNameDisplay').innerText = 'VidranAdmin 👑';
+        document.getElementById('profileAvatarIcon').innerText = '👑';
+        document.getElementById('settingsNameInput').value = 'VidranAdmin';
+        renderStoreGames();
+    }
+
+    async function handleAdminLogin() {
+        var email = document.getElementById('adminUsernameInput').value.trim();
+        var pass = document.getElementById('adminPasswordInput').value;
+        try {
+            await sbLogin(email, pass);
+            document.getElementById('adminPasswordInput').value = '';
             closeAuthModal();
-            renderStoreGames();
-        } else {
+            setAdminUI();
+        } catch (e) {
             document.getElementById('adminErrorMsg').style.display = 'block';
         }
+    }
+
+    function adminLogout() {
+        clearSession();
+        location.reload();
+    }
+
+    async function restoreSession() {
+        try {
+            var raw = localStorage.getItem('vidran-session');
+            if (!raw) return;
+            session = JSON.parse(raw);
+            if (await ensureSession()) setAdminUI();
+        } catch (e) { clearSession(); }
     }
 
     function openAddGameModal() { document.getElementById('addGameModal').classList.add('active'); }
     function closeAddGameModal() { document.getElementById('addGameModal').classList.remove('active'); }
 
-    function submitUploadedGame() {
+    async function submitUploadedGame() {
         var title = document.getElementById('newGameTitle').value.trim();
         var cat = document.getElementById('newGameCategory').value.trim() || 'Aksiyon';
         var fileInput = document.getElementById('newGameFile');
         if (!title) { alert("Lütfen oyun adını girin!"); return; }
+        if (!(await ensureSession())) { alert("Oturum süresi doldu, lütfen tekrar admin girişi yap."); return; }
 
-        function addGame(content) {
-            storeGames.push({ title: title, price: "Ücretsiz", category: cat, color: "#16a085", fileContent: content, uploaded: true });
-            saveUploadedGames();
+        function readFile() {
+            return new Promise(function(resolve) {
+                if (fileInput.files.length === 0) { resolve(null); return; }
+                var reader = new FileReader();
+                reader.onload = function(e) { resolve(e.target.result); };
+                reader.readAsText(fileInput.files[0]);
+            });
+        }
+        var content = await readFile();
+
+        try {
+            var r = await fetch(SB_URL + "/rest/v1/games", {
+                method: "POST",
+                headers: sbHeaders({ "Prefer": "return=representation" }),
+                body: JSON.stringify({ title: title, category: cat, color: "#16a085", content: content })
+            });
+            if (!r.ok) throw new Error(await r.text());
+            var row = (await r.json())[0];
+            storeGames.push({ title: row.title, price: "Ücretsiz", category: row.category, color: row.color, uploaded: true, dbId: row.id });
             renderStoreGames();
             closeAddGameModal();
             document.getElementById('newGameTitle').value = '';
             document.getElementById('newGameCategory').value = '';
             fileInput.value = '';
-            alert(title + " oyunu eklendi!");
-        }
-
-        if (fileInput.files.length > 0) {
-            var reader = new FileReader();
-            reader.onload = function(e) { addGame(e.target.result); };
-            reader.readAsText(fileInput.files[0]);
-        } else {
-            addGame(null);
+            alert(title + " oyunu eklendi! Artık herkes görebilir.");
+        } catch (e) {
+            alert("Oyun kaydedilemedi. Dosya çok büyük olabilir ya da tablo kuruluşunu kontrol et.");
         }
     }
 
-    function deleteGame(idx) {
-        storeGames.splice(idx, 1);
-        saveUploadedGames();
-        renderStoreGames();
+    async function deleteGame(idx) {
+        var g = storeGames[idx];
+        if (!g || !g.dbId) return;
+        if (!confirm(g.title + " silinsin mi?")) return;
+        if (!(await ensureSession())) { alert("Oturum süresi doldu, lütfen tekrar giriş yap."); return; }
+        try {
+            var r = await fetch(SB_URL + "/rest/v1/games?id=eq." + g.dbId, { method: "DELETE", headers: sbHeaders({ "Prefer": "return=minimal" }) });
+            if (!r.ok) throw new Error();
+            storeGames.splice(idx, 1);
+            renderStoreGames();
+        } catch (e) { alert("Silinemedi."); }
     }
 
     /* ---- Filtre ve arama birlikte çalışır ---- */
@@ -789,10 +881,12 @@ footer { text-align: center; padding: 25px; border-top: 1px solid #1a1d28; font-
         window.removeEventListener('keydown', handleSubwayInput);
     }
 
-    window.onload = function() {
-        loadUploadedGames();
+    window.onload = async function() {
         renderStoreGames();
         switchPage('store');
+        await restoreSession();
+        await loadUploadedGames();
+        renderStoreGames();
     };
 </script>
 </body>
